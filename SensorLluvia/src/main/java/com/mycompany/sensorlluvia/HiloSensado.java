@@ -105,7 +105,7 @@ public class HiloSensado extends Thread {
             System.out.println(getTiempo() + " | Lluvia: " + this.lluvia);
 
             try {
-                Thread.sleep(1000);
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
