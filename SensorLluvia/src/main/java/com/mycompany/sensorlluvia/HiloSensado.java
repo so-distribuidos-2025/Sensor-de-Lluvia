@@ -2,6 +2,8 @@ package com.mycompany.sensorlluvia;
 
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * La clase {@code HiloSensado} simula el funcionamiento de un sensor de lluvia.
@@ -100,7 +102,7 @@ public class HiloSensado extends Thread {
         while (on) {
             generarLluvia();
             pw.println(this.lluvia);
-            System.out.println("L=" + this.lluvia);
+            System.out.println(getTiempo() + " | Lluvia: " + this.lluvia);
 
             try {
                 Thread.sleep(1000);
@@ -108,6 +110,11 @@ public class HiloSensado extends Thread {
                 throw new RuntimeException(e);
             }
         }
+    }
+    private String getTiempo(){
+        LocalDateTime myDateObj = LocalDateTime.now();
+        DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("HH:mm:ss");
+        return myDateObj.format(myFormatObj);
     }
 }
 
