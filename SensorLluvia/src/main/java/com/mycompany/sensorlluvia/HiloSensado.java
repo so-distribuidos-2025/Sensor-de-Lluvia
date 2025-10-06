@@ -33,6 +33,8 @@ public class HiloSensado extends Thread {
     /** Flujo de salida para enviar datos al servidor. */
     PrintWriter pw;
 
+    boolean isAuto = false;
+
     /**
      * Crea un nuevo hilo de sensado para el sensor de lluvia.
      *
@@ -85,6 +87,15 @@ public class HiloSensado extends Thread {
      */
     public void apagar() {
         on = false;
+    }
+
+
+    public void setValor(double valor) {
+        this.lluvia = valor;
+    }
+
+    public void setAuto(boolean auto) {
+        this.isAuto = auto;
     }
 
     /**

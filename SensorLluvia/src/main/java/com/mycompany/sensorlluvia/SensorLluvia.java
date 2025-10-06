@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.rmi.Naming;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -56,6 +59,22 @@ public class SensorLluvia {
             // Arranca el hilo de sensado
             HiloSensado sensor = new HiloSensado(cliente, pw);
             sensor.start();
+
+            // --- Lógica RMI ---
+            int port = 22000;
+            String name = "SensorLluviaRMI"; // La consola busca "lluvia"
+            HiloServerRMI hiloServerRMI = new HiloServerRMI(sensor);
+
+            try {
+                LocateRegistry.createRegistry(port);
+                System.out.println("RMI registry created on port " + port);
+            } catch (RemoteException e) {
+                System.out.println("RMI registry already running on port " + port);
+            }
+
+            Naming.rebind("rmi://localhost:" + port + "/" + name, hiloServerRMI);
+            System.out.println(name + " bound in registry");
+
         } catch (IOException ex) {
             Logger.getLogger(SensorLluvia.class.getName()).log(Level.SEVERE, null, ex);
         }
