@@ -49,9 +49,17 @@ public class SensorLluvia {
         InetAddress ipServidor;
         PrintWriter pw;
         try {
-            ipServidor = InetAddress.getByName("localhost");
-            Socket cliente = new Socket(ipServidor, 20000);
-            System.out.println(cliente);
+            String controladorHost = System.getenv("CONTROLADOR_HOST");
+            if (controladorHost == null) {
+                controladorHost = "localhost";
+            }
+            String controladorPort = System.getenv("CONTROLADOR_PORT");
+            if (controladorPort == null) {
+                controladorPort = "20000";
+            }
+            ipServidor = InetAddress.getByName(controladorHost);
+            Socket cliente = new Socket(ipServidor, Integer.parseInt(controladorPort));
+            System.out.println("Conectado al servidor: " + cliente);
             // PrintWriter con autoflush activado
             pw = new PrintWriter(cliente.getOutputStream(), true);
             // Identifica el sensor al servidor
@@ -61,18 +69,26 @@ public class SensorLluvia {
             sensor.start();
 
             // --- Lógica RMI ---
-            int port = 22000;
+            String sensorHostname = System.getenv("HOSTNAME");
+            if (sensorHostname == null) {
+                sensorHostname = "localhost";
+            }
+            String envPort = System.getenv("PORT");
+            if (envPort == null) {
+                envPort = "22000";
+            }
+            int sensorPort = Integer.parseInt(envPort);
             String name = "SensorLluviaRMI"; // La consola busca "lluvia"
             HiloServerRMI hiloServerRMI = new HiloServerRMI(sensor);
 
             try {
-                LocateRegistry.createRegistry(port);
-                System.out.println("RMI registry created on port " + port);
+                LocateRegistry.createRegistry(sensorPort);
+                System.out.println("RMI registry created on port " + sensorPort);
             } catch (RemoteException e) {
-                System.out.println("RMI registry already running on port " + port);
+                System.out.println("RMI registry already running on port " + sensorPort);
             }
 
-            Naming.rebind("rmi://localhost:" + port + "/" + name, hiloServerRMI);
+            Naming.rebind("rmi://" + sensorHostname + ":" + sensorPort + "/" + name, hiloServerRMI);
             System.out.println(name + " bound in registry");
 
         } catch (IOException ex) {
